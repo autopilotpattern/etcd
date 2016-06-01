@@ -1,0 +1,8 @@
+etcd:
+    build: .
+    mem_limit: 128m
+    hostname: etcd
+    ports:
+      - 4001:4001
+      - 2379:2379
+      - 2380:2380
