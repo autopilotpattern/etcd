@@ -7,7 +7,7 @@
     {
       "name": "etcd",
       "port": 4001,
-      "health": "true",
+      "health": "curl --fail -o /dev/null http://127.0.0.1:2379/health",
       "poll": 10,
       "ttl": 25
     }
