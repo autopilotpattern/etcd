@@ -13,8 +13,8 @@ RUN curl -Lso /tmp/etcd.tar.gz https://github.com/coreos/etcd/releases/download/
 EXPOSE 2379 2380 4001
 
 # get ContainerPilot release
-ENV CONTAINERPILOT_VERSION 2.1.4
-RUN export CP_SHA1=480056e1667db33839fd647d60ec6da1fc9543d9 \
+ENV CONTAINERPILOT_VERSION 2.2.0
+RUN export CP_SHA1=243963f871083132f475964fadaddfb894e9b697 \
     && curl -Lso /tmp/containerpilot.tar.gz \
          "https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.tar.gz" \
     && echo "${CP_SHA1}  /tmp/containerpilot.tar.gz" | sha1sum -c \
@@ -24,9 +24,13 @@ RUN export CP_SHA1=480056e1667db33839fd647d60ec6da1fc9543d9 \
 COPY etc/containerpilot.json /etc/
 ENV CONTAINERPILOT=file:///etc/containerpilot.json
 
-# TODO: ideally we'd just run etcd directly under ContainerPilot but
-# current ContainerPilot doesn't support getting the IP address of the
-# container into the forked environment, which we need as part of the
-# command line options for etcd.
-# Follow https://github.com/joyent/containerpilot/issues/171 for more.
-COPY bin/etcd.sh /usr/local/bin/
+CMD [ \
+    "/usr/local/bin/containerpilot", \
+    "/usr/local/bin/etcd", \
+    "-name", "{{ .HOSTNAME }}", \
+    "-initial-advertise-peer-urls", "http://{{ .CONTAINERPILOT_ETCD_IP }}:2380", \
+    "-listen-peer-urls", "http://{{ .CONTAINERPILOT_ETCD_IP }}:2380", \
+    "-listen-client-urls", "http://{{ .CONTAINERPILOT_ETCD_IP }}:2379,http://127.0.0.1:2379", \
+    "-advertise-client-urls", "http://{{ .CONTAINERPILOT_ETCD_IP }}:2379", \
+    "-discovery", "{{ .DISCOVERY }}" \
+    ]

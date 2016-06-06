@@ -12,8 +12,6 @@ etcd:
     environment:
       - DISCOVERY
       - GOMAXPROCS=2
-    command: >-
-      /usr/local/bin/etcd.sh
 
 bootstrap:
     image: autopilotpattern/etcd
