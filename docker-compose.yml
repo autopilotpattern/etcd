@@ -1,0 +1,35 @@
+etcd:
+    image: autopilotpattern/etcd
+    mem_limit: 128m
+    ports:
+      - 4001
+      - 2379
+      - 2380
+    links:
+      - bootstrap:bootstrap
+    labels:
+      - triton.cns.services=etcd
+    environment:
+      - DISCOVERY
+      - GOMAXPROCS=2
+
+bootstrap:
+    image: autopilotpattern/etcd
+    mem_limit: 128m
+    ports:
+      - 4001:4001
+      - 2379:2379
+      - 2380:2380
+    hostname: bootstrap
+    environment:
+      - GOMAXPROCS=2
+    command: >-
+      /usr/local/bin/etcd
+      -name bootstrap
+      -advertise-client-urls http://bootstrap:2379,http://bootstrap:4001
+      -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001
+      -initial-advertise-peer-urls http://bootstrap:2380
+      -listen-peer-urls http://0.0.0.0:2380
+      -initial-cluster-token etcd-cluster-1
+      -initial-cluster bootstrap=http://bootstrap:2380
+      -initial-cluster-state new
