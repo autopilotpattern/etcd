@@ -15,13 +15,8 @@ An etcd cluster needs an external source of data for all the nodes to find each 
 ### Getting started
 
 1. [Get a Joyent account](https://my.joyent.com/landing/signup/) and [add your SSH key](https://docs.joyent.com/public-cloud/getting-started).
-1. Install the [Docker Toolbox](https://docs.docker.com/installation/mac/) (including `docker` and `docker-compose`) on your laptop or other environment, as well as the [Joyent Triton CLI](https://www.joyent.com/blog/introducing-the-triton-command-line-tool) (`triton` replaces our old `sdc-*` CLI tools)
-1. [Configure Docker and Docker Compose for use with Joyent](https://docs.joyent.com/public-cloud/api-access/docker):
-
-```bash
-curl -O https://raw.githubusercontent.com/joyent/sdc-docker/master/tools/sdc-docker-setup.sh && chmod +x sdc-docker-setup.sh
-./sdc-docker-setup.sh -k us-east-1.api.joyent.com <ACCOUNT> ~/.ssh/<PRIVATE_KEY_FILE>
-```
+1. Install the [Docker Toolbox](https://docs.docker.com/installation/mac/) (including `docker` and `docker-compose`) on your laptop or other environment.
+1. Install the the [Joyent Triton CLI](https://docs.joyent.com/public-cloud/api-access/cloudapi) (`triton` replaces our old `sdc-*` CLI tools) and set up your Triton profile.
 
 At this point you're ready to start the cluster. A script `./start.sh` has been provided. It uses Docker Compose and creates the initial discovery token (see the [etcd docs on cluster discovery](https://coreos.com/os/docs/latest/cluster-discovery.html) for details) before scaling up the cluster. You can pass an environment variable `SCALE` to the `./start.sh` script to set the cluster size to something other than the default 3 nodes.
 
