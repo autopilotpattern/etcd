@@ -29,6 +29,7 @@ e_bootstrap_1 is up-to-date
 Creating e_etcd_1
 Creating and starting e_etcd_2 ... done
 Creating and starting e_etcd_3 ... done
+```
 
 ```
 $ docker ps
