@@ -1,5 +1,8 @@
 # Autopilot pattern etcd
 
+*NOTE: this application is deprecated. ContainerPilot v3 removes support for etcd*
+
+
 *[Autopilot Pattern](http://autopilotpattern.io/) implementation of etcd*
 
 [![DockerPulls](https://img.shields.io/docker/pulls/autopilotpattern/etcd.svg)](https://registry.hub.docker.com/u/autopilotpattern/etcd/)
