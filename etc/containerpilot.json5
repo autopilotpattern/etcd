@@ -1,0 +1,37 @@
+{
+  consul: "127.0.0.1:8500",
+  jobs: [
+    {
+      name: "preStart",
+      exec: ["/usr/local/bin/etcd-manage", "preStart"],
+    },
+    {
+      name: "etcd",
+      port: 4001,
+      interfaces: ["eth0"],
+      when: {
+        source: "preStart",
+        once: "exitSuccess",
+      },
+      health:{
+        exec: ["curl", "--fail", "-o", "/dev/null", "http://127.0.0.1:2379/health"],
+        //exec: ["/usr/local/bin/etcd-manage", "health"],
+        interval: 10,
+        ttl: 25,
+      }
+    },
+    {{ if .CONSUL_AGENT }}{
+      name: "consul-agent",
+      exec: [
+        "consul", "agent",
+        "-data-dir=/var/lib/consul",
+        "-config-dir=/etc/consul",
+        "-rejoin",
+        "-retry-join", "{{ if .CONSUL }}{{ .CONSUL }}{{ else }}consul{{ end }}",
+        "-retry-max", "10",
+        "-retry-interval", "10s"
+      ],
+      restarts: "unlimited"
+    },{{ end }}
+  ]
+}

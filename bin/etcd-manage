@@ -1,0 +1,73 @@
+#!/bin/bash
+set -eo pipefail
+
+preStart() {
+  # pull ip address for current machine and set in environment
+  export ETCD_IP=$(hostname -i)
+  _log "Started etcd at ${ETCD_IP}"
+}
+
+# TODO: Need to stop etcd properly
+preStop() {
+  _log "Stopping etcd at ${ETCD_IP}"
+}
+
+start() {
+  preStart
+  /usr/local/bin/etcd \
+    -name ${HOSTNAME} \
+    -initial-advertise-peer-urls http://${ETCD_IP}:2380 \
+    -listen-peer-urls http://0.0.0.0:2380 \
+    -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 \
+    -advertise-client-urls http://${ETCD_IP}:2379 \
+    -discovery ${DISCOVERY}
+}
+
+bootstrap() {
+  preStart
+  /usr/local/bin/etcd \
+    -name bootstrap \
+    -advertise-client-urls http://${ETCD_IP}:2379,http://${ETCD_IP}:4001 \
+    -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 \
+    -initial-advertise-peer-urls http://${ETCD_IP}:2380 \
+    -listen-peer-urls http://0.0.0.0:2380 \
+    -initial-cluster-token etcd-cluster-1 \
+    -initial-cluster bootstrap=http://${ETCD_IP}:2380 \
+    -initial-cluster-state new
+}
+
+# TODO: Need to create the health check here.
+health() {
+  _log "Health check etcd at ${CONTAINERPILOT_ETCD_IP}"
+}
+
+_log() {
+  echo "    $(date -u '+%Y-%m-%d %H:%M:%S') autopilot: $@"
+}
+
+# ---------------------------------------------------
+# parse arguments
+
+# Get function list
+funcs=($(declare -F -p | cut -d " " -f 3))
+
+until
+    if [ ! -z "$1" ]; then
+        # check if the first arg is a function in this file, or use a default
+        if [[ " ${funcs[@]} " =~ " $1 " ]]; then
+            cmd=$1
+            shift 1
+        fi
+
+        $cmd "$@"
+        if [ $? == 127 ]; then
+            help
+        fi
+
+        exit
+    else
+        health
+    fi
+do
+    echo
+done
