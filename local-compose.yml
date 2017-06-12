@@ -26,8 +26,7 @@ services:
       - 4001:4001
       - 2379:2379
       - 2380:2380
-    hostname: bootstrap-etcd
-      - triton.cns.services=bootstrap-etcd
+    hostname: bootstrap
     command: >-
       /usr/local/bin/etcd
       -name bootstrap
