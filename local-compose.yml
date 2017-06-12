@@ -10,10 +10,6 @@ services:
       - 2380
     links:
       - bootstrap:bootstrap
-    env_file:
-      - _env
-    labels:
-      - triton.cns.services=etcd
     environment:
       - DISCOVERY
     command: >-

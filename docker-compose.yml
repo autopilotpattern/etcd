@@ -1,10 +1,6 @@
 etcd:
   image: autopilotpattern/etcd
   mem_limit: 128m
-  ports:
-    - 4001
-    - 2379
-    - 2380
   labels:
     - triton.cns.services=etcd
   environment:
@@ -17,7 +13,5 @@ bootstrap:
   mem_limit: 128m
   ports:
     - 4001:4001
-    - 2379:2379
-    - 2380:2380
   command: >-
     /usr/local/bin/etcd-manage bootstrap
