@@ -16,15 +16,20 @@ help() {
 export COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-e}
 export SCALE=${SCALE:-3}
 
+run() {
+  if [[ -n "${DOCKER_HOST}" ]]; then
+    run-triton
+  else
+    run-local
+  fi
+}
+
 run-local() {
     export COMPOSE_FILE=$(pwd)/local-compose.yml
     echo "Using discovery node for bootstrapping ${SCALE}-node cluster."
     docker-compose up -d bootstrap
     local uuid=$(uuidgen)
     local bootstrap=localhost
-    if [[ -n ${DOCKER_HOST} ]]; then
-        local bootstrap=$(triton ip ${COMPOSE_PROJECT_NAME}_bootstrap_1)
-    fi
     curl -sL -X PUT --fail -d value=3 ${bootstrap}:4001/v2/keys/discovery/${uuid}/_config/size
     export DISCOVERY="http://bootstrap:4001/v2/keys/discovery/${uuid}"
     docker-compose up -d etcd
@@ -47,7 +52,8 @@ run-triton() {
     triton-compose scale etcd=${SCALE}
     sleep 3
     triton-docker stop ${COMPOSE_PROJECT_NAME}_bootstrap_1
-    triton-docker exec ${COMPOSE_PROJECT_NAME}_etcd_3 /usr/local/bin/etcdctl cluster-health
+    local node=$(triton ls -o name | grep -m 1 '^${COMPOSE_PROJECT_NAME}_etcd')
+    triton-docker exec ${node} /usr/local/bin/etcdctl cluster-health
 }
 
 build() {
@@ -73,4 +79,5 @@ do
     echo
 done
 
-run-local # default
+run # default
+
