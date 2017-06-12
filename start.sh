@@ -17,7 +17,7 @@ export COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-e}
 export SCALE=${SCALE:-3}
 
 run() {
-  if [[ -n "${DOCKER_HOST}" ]]; then
+  if [[ $(echo "${DOCKER_CERT_PATH}" | grep "\.triton") ]]; then
     run-triton
   else
     run-local
