@@ -10,6 +10,7 @@ services:
       - 2380
     links:
       - bootstrap:bootstrap
+    restart: always
     environment:
       - DISCOVERY
     command: >-
